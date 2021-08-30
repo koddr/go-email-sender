@@ -1,2 +1,3 @@
-# go-email-sender
-Simple (but useful) email sender for Go. Support HTML templates and attachments.
+# 📮 Go Email Sender
+
+Simple (but useful) email sender written with pure Go `v1.17`. Support HTML templates and attachments.
