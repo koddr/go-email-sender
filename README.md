@@ -64,8 +64,8 @@ Example:
 // Create a new SMTP sender instance with your auth params.
 sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
-// Send the email with HTML template.
-if err := sender.SendHTMLEmail(
+// Send the email with a plain text.
+if err := sender.SendPlainEmail(
     "my/templates/welcome.html",  // path to the HTML template
     []string{"mail@example.com"}, // slice of the emails to send
     "It's a test email!",         // subject of the email
