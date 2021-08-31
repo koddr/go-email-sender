@@ -15,7 +15,7 @@ func (s *Sender) SendHTMLEmail(
     templatePath string,
     dest []string,
     subject string,
-    data interface{}
+    data interface{},
 ) error
 ```
 
@@ -54,7 +54,7 @@ Method signature:
 func (s *Sender) SendPlainEmail(
     dest []string,
     subject string,
-    data string
+    data string,
 ) error
 ```
 
