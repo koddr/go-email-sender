@@ -25,7 +25,7 @@ Example:
 // Create a new struct for the email data.
 type HTMLEmailData struct {
     Name    string
-    Website	string
+    Website string
 }
 
 // Create a new SMTP sender instance with your auth params.
