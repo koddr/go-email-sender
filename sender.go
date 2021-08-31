@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"mime/quotedprintable"
 	"net/smtp"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -52,7 +53,7 @@ func (s *Sender) SendPlainEmail(to, cc []string, subject, data string, files []s
 }
 
 func (s *Sender) attachFile(file string) string {
-	rawFile, err := ioutil.ReadFile(file)
+	rawFile, err := ioutil.ReadFile(filepath.Clean(file))
 	if err != nil {
 		return ""
 	}
