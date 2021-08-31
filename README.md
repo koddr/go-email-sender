@@ -13,9 +13,11 @@ Method signature:
 ```go
 func (s *Sender) SendHTMLEmail(
     templatePath string,
-    dest []string,
+    to []string,
+    cc []string,
     subject string,
     data interface{},
+    files []string,
 ) error
 ```
 
@@ -33,12 +35,20 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
 // Send the email with an HTML template.
 if err := sender.SendHTMLEmail(
-    "my/templates/welcome.html",  // path to the HTML template
-    []string{"mail@example.com"}, // slice of the emails to send
-    "It's a test email!",         // subject of the email
+    "my/templates/welcome.html", // path to the HTML template
+    []string{
+        "mail@example.com"       // slice of the emails to send
+    },
+    []string{
+        "copy-mail@example.com"  // slice of the emails to send email copy
+    },
+    "It's a test email!",        // subject of the email
     &HTMLEmailData{
         Name:    "Vic",
         Website: "https://shostak.dev/",
+    },
+    []string{
+        "my/files/image.jpg",    // slice of the files to send
     },
 ); err != nil {
     // Throw error message, if something went wrong.
@@ -52,9 +62,11 @@ Method signature:
 
 ```go
 func (s *Sender) SendPlainEmail(
-    dest []string,
+    to []string,
+    cc []string,
     subject string,
-    data string,
+    data interface{},
+    files []string,
 ) error
 ```
 
@@ -66,10 +78,17 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
 // Send the email with a plain text.
 if err := sender.SendPlainEmail(
-    "my/templates/welcome.html",  // path to the HTML template
-    []string{"mail@example.com"}, // slice of the emails to send
+    []string{
+        "mail@example.com"        // slice of the emails to send
+    },
+    []string{
+        "copy-mail@example.com"   // slice of the emails to send email copy
+    },
     "It's a test email!",         // subject of the email
     "Here is a plain text body.", // body of the email
+    []string{
+        "my/files/image.jpg",     // slice of the files to send
+    },
 ); err != nil {
     // Throw error message, if something went wrong.
     return fmt.Errorf("Something went wrong: %v", err)

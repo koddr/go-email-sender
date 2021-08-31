@@ -2,10 +2,13 @@ package sender
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"mime/quotedprintable"
 	"net/smtp"
 	"strings"
+	"time"
 )
 
 // Sender struct for describe auth data for sending emails.
@@ -24,7 +27,7 @@ func NewEmailSender(login, password, server string, port int) *Sender {
 
 // SendHTMLEmail func for send email with given HTML template and data.
 // If template is empty string, it will throw error.
-func (s *Sender) SendHTMLEmail(templatePath string, dest []string, subject string, data interface{}) error {
+func (s *Sender) SendHTMLEmail(templatePath string, to, cc []string, subject string, data interface{}, files []string) error {
 	if templatePath == "" {
 		return fmt.Errorf("Template not found in the given path!")
 	}
@@ -32,52 +35,75 @@ func (s *Sender) SendHTMLEmail(templatePath string, dest []string, subject strin
 	if err != nil {
 		return err
 	}
-	body := s.writeEmail(dest, "text/html", subject, tmpl)
-	if err := s.sendEmail(dest, subject, body); err != nil {
+	body := s.writeEmail(to, cc, "text/html", subject, tmpl, files)
+	if err := s.sendEmail(to, subject, body); err != nil {
 		return err
 	}
 	return nil
 }
 
 // SendPlainEmail func for send plain text email with data.
-func (s *Sender) SendPlainEmail(dest []string, subject, data string) error {
-	body := s.writeEmail(dest, "text/plain", subject, data)
-	if err := s.sendEmail(dest, subject, body); err != nil {
+func (s *Sender) SendPlainEmail(to, cc []string, subject, data string, files []string) error {
+	body := s.writeEmail(to, cc, "text/plain", subject, data, files)
+	if err := s.sendEmail(to, subject, body); err != nil {
 		return err
 	}
 	return nil
 }
 
-// writeEmail method for prepare email header and body to send.
-func (s *Sender) writeEmail(dest []string, contentType, subject, body string) string {
+func (s *Sender) attachFile(file string) string {
+	rawFile, err := ioutil.ReadFile(file)
+	if err != nil {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString(rawFile)
+}
+
+// writeEmail method for prepare email header, body and files to send.
+func (s *Sender) writeEmail(to, cc []string, ct, subj, body string, files []string) string {
 	// Define variables.
 	var message string
-	var header map[string]string
-	var encodedMessage bytes.Buffer
+	var encodedBody bytes.Buffer
 
-	// Create header.
-	header["From"] = s.Login
-	header["To"] = strings.Join(dest, ",")
-	header["Subject"] = subject
-	header["MIME-Version"] = "1.0"
-	header["Content-Type"] = fmt.Sprintf("%s; charset=\"utf-8\"", contentType)
-	header["Content-Transfer-Encoding"] = "quoted-printable"
-	header["Content-Disposition"] = "inline"
+	// Create delimiter.
+	delimiter := fmt.Sprintf("**=mail%d", time.Now().UnixNano())
 
-	// Add header values to the message.
-	for key, value := range header {
-		message += fmt.Sprintf("%s:%s\r\n", key, value)
-	}
-
-	// Create writer for make encoding the message.
-	result := quotedprintable.NewWriter(&encodedMessage)
+	// Create writer for make encoding the email's body.
+	result := quotedprintable.NewWriter(&encodedBody)
 	if _, err := result.Write([]byte(body)); err != nil {
 		return ""
 	}
 	defer result.Close()
 
-	// Return the encoded message string.
-	message += "\r\n" + encodedMessage.String()
+	// Create message.
+	message += fmt.Sprintf("From: %s\r\n", s.Login)
+	message += fmt.Sprintf("To: %s\r\n", strings.Join(to, ";"))
+	if len(cc) > 0 {
+		// If CC is specified.
+		message += fmt.Sprintf("Cc: %s\r\n", strings.Join(cc, ";"))
+	}
+	message += fmt.Sprintf("Subject: %s\r\n", subj)
+	message += fmt.Sprintf("MIME-Version: 1.0\r\n")
+	message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\r\n", delimiter)
+
+	//
+	message += fmt.Sprintf("--%s\r\n", delimiter)
+	message += fmt.Sprintf("Content-Transfer-Encoding: quoted-printable\r\n")
+	message += fmt.Sprintf("Content-Type: %s; charset=\"utf-8\"\r\n", ct)
+	message += fmt.Sprintf("Content-Disposition: inline\r\n")
+	message += fmt.Sprintf("%s\r\n", encodedBody.String())
+
+	// If files are specified.
+	if len(files) > 0 {
+		for _, file := range files {
+			message += fmt.Sprintf("--%s\r\n", delimiter)
+			message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
+			message += fmt.Sprintf("Content-Type: text/plain; charset=\"utf-8\"\r\n")
+			message += fmt.Sprintf("Content-Disposition: attachment; filename=\"%s\"\r\n", file)
+			message += fmt.Sprintf("\r\n%s", s.attachFile(file))
+		}
+	}
+
 	return message
 }
 
