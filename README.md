@@ -37,10 +37,10 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 if err := sender.SendHTMLEmail(
     "my/templates/welcome.html", // path to the HTML template
     []string{
-        "mail@example.com",      // slice of the emails to send
+        "mail@example.com",      // slice of emails to send
     },
     []string{
-        "copy-mail@example.com", // slice of the emails to send email copy
+        "copy-mail@example.com", // slice of emails to send message copy
     },
     "It's a test email!",        // subject of the email
     &HTMLEmailData{
@@ -48,7 +48,7 @@ if err := sender.SendHTMLEmail(
         Website: "https://shostak.dev/",
     },
     []string{
-        "my/files/image.jpg",    // slice of the files to send
+        "my/files/image.jpg",    // slice of files to send
     },
 ); err != nil {
     // Throw error message, if something went wrong.
@@ -79,15 +79,15 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 // Send the email with a plain text.
 if err := sender.SendPlainEmail(
     []string{
-        "mail@example.com",       // slice of the emails to send
+        "mail@example.com",       // slice of emails to send
     },
     []string{
-        "copy-mail@example.com",  // slice of the emails to send email copy
+        "copy-mail@example.com",  // slice of emails to send message copy
     },
     "It's a test email!",         // subject of the email
     "Here is a plain text body.", // body of the email
     []string{
-        "my/files/image.jpg",     // slice of the files to send
+        "my/files/image.jpg",     // slice of files to send
     },
 ); err != nil {
     // Throw error message, if something went wrong.

@@ -86,7 +86,7 @@ func (s *Sender) writeEmail(to, cc []string, ct, subj, body string, files []stri
 	message += fmt.Sprintf("MIME-Version: 1.0\r\n")
 	message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\r\n", delimiter)
 
-	//
+	// Add body of the message (from html template or plain text).
 	message += fmt.Sprintf("--%s\r\n", delimiter)
 	message += fmt.Sprintf("Content-Transfer-Encoding: quoted-printable\r\n")
 	message += fmt.Sprintf("Content-Type: %s; charset=\"utf-8\"\r\n", ct)
@@ -95,6 +95,7 @@ func (s *Sender) writeEmail(to, cc []string, ct, subj, body string, files []stri
 
 	// If files are specified.
 	if len(files) > 0 {
+		// Add body of the each file to the message.
 		for _, file := range files {
 			message += fmt.Sprintf("--%s\r\n", delimiter)
 			message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
