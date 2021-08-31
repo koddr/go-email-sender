@@ -28,13 +28,13 @@ func (s *Sender) SendHTMLEmail(templatePath string, dest []string, subject strin
 	if templatePath == "" {
 		return fmt.Errorf("Template not found in the given path!")
 	}
-	tmpl, errParseTemplate := ParseTemplate(templatePath, data)
-	if errParseTemplate != nil {
-		return errParseTemplate
+	tmpl, err := ParseTemplate(templatePath, data)
+	if err != nil {
+		return err
 	}
 	body := s.writeEmail(dest, "text/html", subject, tmpl)
-	if errSendEmail := s.sendEmail(dest, subject, body); errSendEmail != nil {
-		return errSendEmail
+	if err := s.sendEmail(dest, subject, body); err != nil {
+		return err
 	}
 	return nil
 }
@@ -42,8 +42,8 @@ func (s *Sender) SendHTMLEmail(templatePath string, dest []string, subject strin
 // SendPlainEmail func for send plain text email with data.
 func (s *Sender) SendPlainEmail(dest []string, subject, data string) error {
 	body := s.writeEmail(dest, "text/plain", subject, data)
-	if errSendEmail := s.sendEmail(dest, subject, body); errSendEmail != nil {
-		return errSendEmail
+	if err := s.sendEmail(dest, subject, body); err != nil {
+		return err
 	}
 	return nil
 }
@@ -71,8 +71,10 @@ func (s *Sender) writeEmail(dest []string, contentType, subject, body string) st
 
 	// Create writer for make encoding the message.
 	result := quotedprintable.NewWriter(&encodedMessage)
-	result.Write([]byte(body))
-	result.Close()
+	if _, err := result.Write([]byte(body)); err != nil {
+		return ""
+	}
+	defer result.Close()
 
 	// Return the encoded message string.
 	message += "\r\n" + encodedMessage.String()
