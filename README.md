@@ -31,7 +31,7 @@ type HTMLEmailData struct {
 // Create a new SMTP sender instance with your auth params.
 sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
-// Send the email with HTML template.
+// Send the email with an HTML template.
 if err := sender.SendHTMLEmail(
     "my/templates/welcome.html",  // path to the HTML template
     []string{"mail@example.com"}, // slice of the emails to send
