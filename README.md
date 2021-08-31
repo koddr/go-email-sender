@@ -11,7 +11,12 @@ Support **HTML templates** and **attachments**.
 Method signature:
 
 ```go
-func (s *Sender) SendHTMLEmail(templatePath string, dest []string, subject string, data interface{}) error
+func (s *Sender) SendHTMLEmail(
+    templatePath string,
+    dest []string,
+    subject string,
+    data interface{}
+) error
 ```
 
 Example:
@@ -28,14 +33,15 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
 // Send the email with HTML template.
 if err := sender.SendHTMLEmail(
-    "my/templates/welcome.html",
-    []string{"mail@example.com"},
-    "It's a test email!",
+    "my/templates/welcome.html",  // path to the HTML template
+    []string{"mail@example.com"}, // slice of the emails to send
+    "It's a test email!",         // subject of the email
     &HTMLEmailData{
         Name:    "Vic",
         Website: "https://shostak.dev/",
     },
 ); err != nil {
+    // Throw error message, if something went wrong.
     return fmt.Errorf("Something went wrong: %v", err)
 }
 ```
@@ -45,7 +51,11 @@ if err := sender.SendHTMLEmail(
 Method signature:
 
 ```go
-func (s *Sender) SendPlainEmail(dest []string, subject, data string) error
+func (s *Sender) SendPlainEmail(
+    dest []string,
+    subject string,
+    data string
+) error
 ```
 
 Example:
@@ -62,14 +72,15 @@ sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
 // Send the email with HTML template.
 if err := sender.SendHTMLEmail(
-    "my/templates/welcome.html",
-    []string{"mail@example.com"},
-    "It's a test email!",
+    "my/templates/welcome.html",  // path to the HTML template
+    []string{"mail@example.com"}, // slice of the emails to send
+    "It's a test email!",         // subject of the email
     &PlainEmailData{
         Company: "True web artisans",
         Website: "https://1wa.co/",
     },
 ); err != nil {
+    // Throw error message, if something went wrong.
     return fmt.Errorf("Something went wrong: %v", err)
 }
 ```
