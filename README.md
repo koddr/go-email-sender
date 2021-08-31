@@ -61,12 +61,6 @@ func (s *Sender) SendPlainEmail(
 Example:
 
 ```go
-// Create a new struct for the email data.
-type PlainEmailData struct {
-    Company string
-    Website	string
-}
-
 // Create a new SMTP sender instance with your auth params.
 sender := NewEmailSender("mail@test.com", "secret", "smtp.test.com", 25)
 
@@ -75,10 +69,7 @@ if err := sender.SendHTMLEmail(
     "my/templates/welcome.html",  // path to the HTML template
     []string{"mail@example.com"}, // slice of the emails to send
     "It's a test email!",         // subject of the email
-    &PlainEmailData{
-        Company: "True web artisans",
-        Website: "https://1wa.co/",
-    },
+    "Here is a plain text body.", // body of the email
 ); err != nil {
     // Throw error message, if something went wrong.
     return fmt.Errorf("Something went wrong: %v", err)
