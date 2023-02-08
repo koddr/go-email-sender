@@ -97,4 +97,4 @@ if err := sender.SendPlainEmail(
 
 ## ⚠️ License
 
-Apache-2.0 © [Vic Shóstak](https://shostak.dev/) & [True web artisans](https://1wa.co/).
+Apache-2.0 © [Vic Shóstak](https://github.com/koddr) & [True web artisans](https://truewebartisans.com).
